@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>House Bill Calculator</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .input-container {
+            margin-bottom: 20px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        p {
+            margin: 10px 0;
+            color: #333;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                margin: 10px;
+            }
+
+            .input-container, #result {
+                width: 100%;
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <h1>House Bill Calculator</h1>
+
+    <div class="input-container">
+        <label for="sanctionedLoad">Sanctioned Load (KW/KVA):</label>
+        <select id="sanctionedLoad">
+            <option value="1">1</option>
+            <option value="1.5">1.5</option>
+            <option value="2">2</option>
+            <option value="2.5">2.5</option>
+            <option value="3">3</option>
+        </select>
+
+        <label for="unitsConsumed">Units Consumed:</label>
+        <input type="number" id="unitsConsumed" min="0">
+
+        <label for="ratePerUnit">Rate of Per Unit:</label>
+        <input type="number" id="ratePerUnit" min="0">
+    </div>
+
+    <button onclick="calculateBill()">Calculate Bill</button>
+   <!--.<button onclick="saveAsPDF()" style="display: none;" id="savePdfButton">Save as PDF</button>
+..--> 
+    <div id="result">
+        <h2>Bill Details</h2>
+        <p>Fixed Charges: <span id="fixedCharges"></span></p>
+        <p>Energy Charges: <span id="energyCharges"></span></p>
+        <p>PPAC on Fixed Charges: <span id="ppacFixed"></span></p>
+        <p>PPAC on Energy Charges: <span id="ppacEnergy"></span></p>
+        <p>Differential PPAC on Fixed Charges: <span id="diffPpacFixed"></span></p>
+        <p>Differential PPAC on Energy Charges: <span id="diffPpacEnergy"></span></p>
+        <p>Surcharge on Fixed Charges: <span id="surchargeFixed"></span></p>
+        <p>Surcharge on Energy Charges: <span id="surchargeEnergy"></span></p>
+        <p>Pension Trust Surcharge on Fixed Charges: <span id="pensionFixed"></span></p>
+        <p>Pension Trust Surcharge on Energy Charges: <span id="pensionEnergy"></span></p>
+        <p>Electricity Tax: <span id="electricityTax"></span></p>
+        <p>Total Bill: <span id="totalBill"></span></p>
+    </div>
+
+    <script>
+        function calculateBill() {
+            const sanctionedLoad = parseFloat(document.getElementById("sanctionedLoad").value);
+            const unitsConsumed = parseInt(document.getElementById("unitsConsumed").value);
+            const ratePerUnit = parseFloat(document.getElementById("ratePerUnit").value);
+
+            // Calculate charges
+            const fixedCharges = sanctionedLoad * 250; 
+            const energyCharges = ratePerUnit * unitsConsumed;
+
+            // Calculate PPAC
+            const ppacFixed = fixedCharges * 0.0875;
+            const ppacEnergy = energyCharges * 0.0875;
+            const diffPpacFixed = fixedCharges * 0.275;
+            const diffPpacEnergy = energyCharges * 0.275;
+
+            // Calculate Surcharge
+            const surchargeFixed = fixedCharges * 0.08;
+            const surchargeEnergy = energyCharges * 0.08;
+
+            // Calculate Pension Trust Surcharge
+            const pensionFixed = energyCharges * 0.0862; 
+            const pensionEnergy = fixedCharges * 0.07; 
+
+            // Calculate Electricity Tax
+            const electricityTax = energyCharges * 0.058;
+
+            // Calculate Total Bill
+            const totalBill = 
+                fixedCharges + 
+                energyCharges + 
+                ppacFixed + 
+                ppacEnergy + 
+                diffPpacFixed + 
+                diffPpacEnergy + 
+                surchargeFixed + 
+                surchargeEnergy + 
+                pensionFixed + 
+                pensionEnergy + 
+                electricityTax;
+
+            // Display results
+            document.getElementById("fixedCharges").textContent = fixedCharges.toFixed(2);
+            document.getElementById("energyCharges").textContent = energyCharges.toFixed(2);
+            document.getElementById("ppacFixed").textContent = ppacFixed.toFixed(2);
+            document.getElementById("ppacEnergy").textContent = ppacEnergy.toFixed(2);
+            document.getElementById("diffPpacFixed").textContent = diffPpacFixed.toFixed(2);
+            document.getElementById("diffPpacEnergy").textContent = diffPpacEnergy.toFixed(2);
+            document.getElementById("surchargeFixed").textContent = surchargeFixed.toFixed(2);
+            document.getElementById("surchargeEnergy").textContent = surchargeEnergy.toFixed(2);
+            document.getElementById("pensionFixed").textContent = pensionFixed.toFixed(2);
+            document.getElementById("pensionEnergy").textContent = pensionEnergy.toFixed(2);
+            document.getElementById("electricityTax").textContent = electricityTax.toFixed(2);
+            document.getElementById("totalBill").textContent = totalBill.toFixed(2);
+
+            document.getElementById("result").style.display = "block";
+            document.getElementById("savePdfButton").style.display = "block";
+        }
+
+        function saveAsPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.text("Bill Details", 10, 10);
+            const content = document.getElementById("result").textContent;
+            doc.text(content, 10, 20);
+            doc.save("BillDetails.pdf");
+        }
+    </script>
+</body>
+</html>
