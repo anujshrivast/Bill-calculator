@@ -1,5 +1,5 @@
 This Web Page for House or Shop Bill calculation based on unit consumed and Load.
-This page work Mostly precisely For 2 load ( charges based on tata power DDL only  )
+This page work Mostly precise For 2 load ( charges based on tata power DDL only  )
 
 Three inputs  
 1. Sanctioned Load (KW/KVA)  :with values select from 1 , 1.5,2,2.5,3
